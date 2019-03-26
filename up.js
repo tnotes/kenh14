@@ -53,7 +53,7 @@ function byteLength(str) {
 }
 let postID = async ({cookie})=>{
     let options = {
-        url:'http://tintucthugian.com/wp-admin/post-new.php',
+        url:'http://thugianvl.com/wp-admin/post-new.php',
         method:'GET',
         headers:{
             cookie,
@@ -71,7 +71,7 @@ let postID = async ({cookie})=>{
 };
 let mediaID = async ({id,cookie,image,_wpnonce})=>{
     let options = {
-        url:'http://tintucthugian.com/wp-admin/async-upload.php',
+        url:'http://thugianvl.com/wp-admin/async-upload.php',
         method:'POST',
         headers:{
             'Content-Type':'multipart/form-data; boundary=----WebKitFormBoundary6DMXsZkjAYvKzqRi',
@@ -106,7 +106,7 @@ let upPost = async ({id,cookie,nonce,featured_media,content,title,categoryID})=>
     });
 
     let options = {
-        url: 'http://tintucthugian.com/index.php/wp-json/wp/v2/posts/'+id,
+        url: 'http://thugianvl.com/index.php/wp-json/wp/v2/posts/'+id,
         method: 'POST',
         headers: {
             'Content-Length': byteLength(data),

@@ -4,6 +4,7 @@ let CronJob  = require('cron').CronJob;
 const fs = require('fs');
 const up = require('./up');
 const getPOST = require('./get-post');
+const getPOST_eva = require('./get-post-eva');
 let fullPOST = async ({link})=>{
     let options = {
         url:link,
@@ -18,26 +19,20 @@ let fullPOST = async ({link})=>{
     let content = $('div.post-content').html()+'<div style="margin-top:50px"></div>';
     return {content}
 };
-/*
-new CronJob('00 00 11 * * *', async function () {
-    let list = fs.readFileSync('./link.txt','utf-8');
-    let arr = list.split('\n');
-    if(arr.legnth > 1312){
-        let start = arr.length-1312;
-        list = arr.slice(start).join('\n');
-    }
-    let data = await getPOST();
-    for({title,link,image,categoryID} of data){
-        if(!list.includes(link)){
-            let {content} = await fullPOST({link});
-            await up({title,content,image,categoryID});
-            list+=link+'\n';
-            fs.writeFileSync('./link.txt',list)
+let fullPOST_eva = async ({link})=>{
+    let options = {
+        url:link,
+        method:'GET',
+        headers:{
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5376e Safari/8536.25'
         }
-    }
-}, null, true, 'Asia/Ho_Chi_Minh');
-
-*/
+    };
+    let html = await request(options);
+    let $ = cheerio.load(html);
+    $('div#icon_mang_mxh').remove();
+    let content = $('section#div_news_content').html()+'<div style="margin-top:50px"></div>';
+    return {content}
+};
 (async ()=>{
     let list = fs.readFileSync('./link.txt','utf-8');
     let arr = list.split('\n');
@@ -45,6 +40,15 @@ new CronJob('00 00 11 * * *', async function () {
         let start = arr.length-1312;
         list = arr.slice(start).join('\n');
     }
+    let data_EVA = await getPOST();
+    for({title,link,image,categoryID} of data_EVA){
+        if(!list.includes(link)){
+            let {content} = await fullPOST_eva({link});
+            await up({title,content,image,categoryID});
+            list+=link+'\n';
+            fs.writeFileSync('./link.txt',list)
+        }
+    }
     let data = await getPOST();
     for({title,link,image,categoryID} of data){
         if(!list.includes(link)){
@@ -54,4 +58,8 @@ new CronJob('00 00 11 * * *', async function () {
             fs.writeFileSync('./link.txt',list)
         }
     }
+
 })();
+new CronJob('00 01 * * * *', async function () {
+
+}, null, true, 'Asia/Ho_Chi_Minh');
