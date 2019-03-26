@@ -1,5 +1,12 @@
 const request = require('request-promise');
 const cheerio = require('cheerio');
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
 let getPOST = async ({id,path})=>{
     let options = {
         url:'http://m.kenh14.vn/'+path+'/page-1.chn',
@@ -60,5 +67,8 @@ module.exports = async ()=>{
         let data = await getPOST({id,path});
         listPost = listPost.concat(data);
     }
-    return listPost;
+    listPost = listPost.filter(({title})=>{
+        if(!title.includes('Clip') && !title.includes('Video')) return this;
+    });
+    return await shuffle(listPost);
 };

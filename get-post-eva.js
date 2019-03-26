@@ -42,5 +42,8 @@ module.exports = async ()=>{
         let data = await getPOST({id,path});
         listPost = listPost.concat(data);
     }
+    listPost = listPost.filter(({title})=>{
+        if(!title.includes('Clip') && !title.includes('Video')) return this;
+    });
     return await shuffle(listPost);
 };
