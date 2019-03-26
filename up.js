@@ -133,7 +133,7 @@ let up = async ({title,content,image,categoryID}) => {
         let featured_media = await mediaID({id,cookie,_wpnonce,image});
         return await upPost({id,cookie,nonce,featured_media,title,content,categoryID});
     }catch (e) {
-        console.log('error');
+        console.log(e);
         cookie = await getCookie();
         return await up({title,content,image,categoryID})
     }

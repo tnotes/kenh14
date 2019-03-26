@@ -28,12 +28,21 @@ let fullPOST_eva = async ({link})=>{
         }
     };
     let html = await request(options);
+    html = html.replace(/<br>/g,'');
+
     let $ = cheerio.load(html);
     $('div#icon_mang_mxh').remove();
-    let content = $('section#div_news_content').html().toString();
+    $('div.btnSe').remove();
+    $('div.evtBoxPrBt').remove();
+    $('div#div_inpage_banner_inner').remove();
+    $('div#fb-root').remove();
+    $('script').remove();
+
+
+    let content = $('section#div_news_content').html() || '';
+
     content = content.replace(/src="/g,'not="');
     content = content.replace(/data-original="/g,'src="');
-
     return {content}
 };
 
@@ -47,9 +56,9 @@ let fullPOST_eva = async ({link})=>{
 
     let data_EVA = await getPOST_eva();
     for({title,link,image,categoryID} of data_EVA){
-        if(!list.includes(link)){
+        if(!list.includes(link) && title && link && image && categoryID){
             let {content} = await fullPOST_eva({link});
-            if(content){
+            if(content.length > 10){
                 await up({title,content,image,categoryID});
                 list+=link+'\n';
                 fs.writeFileSync('./link.txt',list)
@@ -58,17 +67,18 @@ let fullPOST_eva = async ({link})=>{
     }
 
 
-    /*
+
+
     let data = await getPOST();
     for({title,link,image,categoryID} of data){
-        if(!list.includes(link)){
+        if(!list.includes(link) && title && link && image && categoryID){
             let {content} = await fullPOST({link});
             await up({title,content,image,categoryID});
             list+=link+'\n';
             fs.writeFileSync('./link.txt',list)
         }
     }
-    */
+
 
 })();
 new CronJob('00 01 * * * *', async function () {
