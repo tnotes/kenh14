@@ -30,9 +30,13 @@ let fullPOST_eva = async ({link})=>{
     let html = await request(options);
     let $ = cheerio.load(html);
     $('div#icon_mang_mxh').remove();
-    let content = $('section#div_news_content').html()+'<div style="margin-top:50px"></div>';
+    let content = $('section#div_news_content').html().toString();
+    content = content.replace(/src="/g,'not="');
+    content = content.replace(/data-original="/g,'src="');
+
     return {content}
 };
+
 (async ()=>{
     let list = fs.readFileSync('./link.txt','utf-8');
     let arr = list.split('\n');
@@ -40,15 +44,21 @@ let fullPOST_eva = async ({link})=>{
         let start = arr.length-1312;
         list = arr.slice(start).join('\n');
     }
-    let data_EVA = await getPOST();
+
+    let data_EVA = await getPOST_eva();
     for({title,link,image,categoryID} of data_EVA){
         if(!list.includes(link)){
             let {content} = await fullPOST_eva({link});
-            await up({title,content,image,categoryID});
-            list+=link+'\n';
-            fs.writeFileSync('./link.txt',list)
+            if(content){
+                await up({title,content,image,categoryID});
+                list+=link+'\n';
+                fs.writeFileSync('./link.txt',list)
+            }
         }
     }
+
+
+    /*
     let data = await getPOST();
     for({title,link,image,categoryID} of data){
         if(!list.includes(link)){
@@ -58,6 +68,7 @@ let fullPOST_eva = async ({link})=>{
             fs.writeFileSync('./link.txt',list)
         }
     }
+    */
 
 })();
 new CronJob('00 01 * * * *', async function () {
