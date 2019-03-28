@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 
 module.exports = async () => {
-    const browser = await puppeteer.launch({headless:true});
+    const browser = await puppeteer.launch({headless:true,args: ['--no-sandbox']});
     const page = await browser.newPage();
     await page.goto('http://www.coivui.com/wp-admin');
     await page.evaluate((a, b) => {
