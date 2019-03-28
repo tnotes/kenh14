@@ -21,7 +21,8 @@ let getPOST = async ({id,path})=>{
     $("article").each(function(){
         let title = $(this).find('header').text().trim();
         let image = $(this).find('img').attr('data-original');
-        let link = $(this).find('a').attr('href');
+        let link = $(this).find('a[href*="eva.vn"]').attr('href') || 'bit.ly';
+
         arr_title.push({title,image,link,categoryID:id})
     });
     return arr_title;
@@ -42,8 +43,8 @@ module.exports = async ()=>{
         let data = await getPOST({id,path});
         listPost = listPost.concat(data);
     }
-    listPost = listPost.filter(({title})=>{
-        if(!title.includes('Clip') && !title.includes('Video')) return this;
+    listPost = listPost.filter(({title,link})=>{
+        if(!title.includes('Clip') && !title.includes('Video') && !link.includes('bit.ly')) return this;
     });
     return await shuffle(listPost);
 };

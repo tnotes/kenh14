@@ -1,4 +1,4 @@
-const request = require('request-promise');
+﻿const request = require('request-promise');
 const cheerio = require('cheerio');
 const fs = require('fs');
 const getCookie = require('./cookie');
@@ -53,14 +53,19 @@ function byteLength(str) {
 }
 let postID = async ({cookie})=>{
     let options = {
-        url:'http://thugianvl.com/wp-admin/post-new.php',
+        url:'http://coivui.com/wp-admin/post-new.php',
         method:'GET',
         headers:{
             cookie,
         }
     };
-    let html = await request(options);
-    let $ = cheerio.load(html);
+    try {
+        var html = await request(options);
+        var $ = cheerio.load(html);
+    }catch (e) {
+        throw 'Cookie hết hạn - CODE:999';
+
+    }
     let id = $('input#post_ID').val() || null;
     let _wpnonce = FINDid(html,'"_wpnonce":"','"')[0] || null;
     let nonce = FINDid(html,'createNonceMiddleware( "','"')[0] || null;
@@ -71,7 +76,7 @@ let postID = async ({cookie})=>{
 };
 let mediaID = async ({id,cookie,image,_wpnonce})=>{
     let options = {
-        url:'http://thugianvl.com/wp-admin/async-upload.php',
+        url:'http://coivui.com/wp-admin/async-upload.php',
         method:'POST',
         headers:{
             'Content-Type':'multipart/form-data; boundary=----WebKitFormBoundary6DMXsZkjAYvKzqRi',
@@ -106,7 +111,7 @@ let upPost = async ({id,cookie,nonce,featured_media,content,title,categoryID})=>
     });
 
     let options = {
-        url: 'http://thugianvl.com/index.php/wp-json/wp/v2/posts/'+id,
+        url: 'http://coivui.com/index.php/wp-json/wp/v2/posts/'+id,
         method: 'POST',
         headers: {
             'Content-Length': byteLength(data),
@@ -133,7 +138,6 @@ let up = async ({title,content,image,categoryID}) => {
         let featured_media = await mediaID({id,cookie,_wpnonce,image});
         return await upPost({id,cookie,nonce,featured_media,title,content,categoryID});
     }catch (e) {
-        console.log(e);
         cookie = await getCookie();
         return await up({title,content,image,categoryID})
     }
