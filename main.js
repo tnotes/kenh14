@@ -45,7 +45,38 @@ let fullPOST_eva = async ({link})=>{
     content = content.replace(/data-original="/g,'src="');
     return {content}
 };
+(async ()=>{
+let list = fs.readFileSync('./link.txt','utf-8');
+    let arr = list.split('\n');
+    if(arr.legnth > 1312){
+        let start = arr.length-1312;
+        list = arr.slice(start).join('\n');
+    }
 
+
+    let data_EVA = await getPOST_eva();
+    for({title,link,image,categoryID} of data_EVA){
+        if(!list.includes(link) && title && link && image && categoryID){
+            let {content} = await fullPOST_eva({link});
+            if(content.length > 10){
+                await up({title,content,image,categoryID});
+                list+=link+'\n';
+                fs.writeFileSync('./link.txt',list)
+            }
+        }
+    }
+
+    let data = await getPOST();
+
+    for({title,link,image,categoryID} of data){
+        if(!list.includes(link) && title && link && image && categoryID){
+            let {content} = await fullPOST({link});
+            await up({title,content,image,categoryID});
+            list+=link+'\n';
+            fs.writeFileSync('./link.txt',list)
+        }
+    }
+})();
 new CronJob('00 01 * * * *', async function () {
     let list = fs.readFileSync('./link.txt','utf-8');
     let arr = list.split('\n');
